@@ -109,7 +109,7 @@ double add(double da, double db)
 
 double mul(double da, double db)
 {
-    if (da <= eps || db <= eps) {
+    if (fabs(da) <= eps || fabs(db) <= eps) {
         return 0;
     }
     dnom a;
