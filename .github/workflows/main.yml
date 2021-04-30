@@ -30,3 +30,18 @@ jobs:
 
       - name: Компиляция
         run: make clean ; make werror
+
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install GCC
+        run: sudo apt-get install -y build-essential
+
+      - name: Компиляция
+        run: make
+
+      - name: Тестирование
+        run: python3 ./.github/tester.py
