@@ -47,6 +47,7 @@ double comp(dnom nom)
     return ans;
 }
 
+/*
 double add(double da, double db)
 {
     uint64_t *pa = (uint64_t *)&da;
@@ -91,13 +92,7 @@ double add(double da, double db)
             ans.exp--;
         }
     }
-    /*
-        printf("de %d \n", de);
-        prmt(a.mt);
-        printf("\n");
-        prmt(b.mt);
-        printf("\n");
-    */
+
     // assert(!(mt<(uint64_t)1<<54 || de<0));
 
     while (mt >= (uint64_t)1 << (mtsz + 1)) {
@@ -110,9 +105,11 @@ double add(double da, double db)
     return comp(ans);
 }
 
+*/
+
 double mul(double da, double db)
 {
-    if (da == 0 || db == 0) {
+    if (da <= eps || db <= eps) {
         return 0;
     }
     dnom a;
@@ -123,10 +120,10 @@ double mul(double da, double db)
     dnom ans;
     ans.sign = (a.sign + b.sign) % 2;
     ans.mt = 0;
-    ans.exp = a.exp + b.exp - 1023;
+    ans.exp = a.exp + b.exp - chex;
     /*
-     for(int i=0;i<53;++i){
-         for(int j=0;j<53;++j){
+     for(int i=0;i<(mtsz+1);++i){
+         for(int j=0;j<(mtsz+1);++j){
              if(i+j>=52){
                  ans.mt+=((a.mt>>(i))*((uint64_t)1<<i)*(b.mt>>j)*((uint64_t)1<<j))<<(i+j-52);
              }
@@ -136,9 +133,9 @@ double mul(double da, double db)
     // ans.exp-=52-43;
      */
 
-    for (int i = 0; i < 53; ++i) {
-        ans.mt += (b.mt >> (52 - i)) * ((((uint64_t)1 << i) & (a.mt)) >> i);
-        if ((b.mt >> (52 - i)) * ((((uint64_t)1 << i) & (a.mt)) >> i)) {
+    for (int i = 0; i < (mtsz + 1); ++i) {
+        ans.mt += (b.mt >> (mtsz - i)) * ((((uint64_t)1 << i) & (a.mt)) >> i);
+        if ((b.mt >> (mtsz - i)) && ((((uint64_t)1 << i) & (a.mt)) >> i)) {
             // printf("%d\n",i);
         }
     }
@@ -147,7 +144,7 @@ double mul(double da, double db)
     prmt(a.mt);
     prmt(b.mt);
     */
-    while (ans.mt >= ((uint64_t)1 << 53)) {
+    while (ans.mt >= ((uint64_t)1 << (mtsz + 1))) {
         ans.exp++;
         ans.mt /= 2;
     }
